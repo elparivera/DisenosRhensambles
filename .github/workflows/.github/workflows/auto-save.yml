@@ -1,30 +1,50 @@
 name: Auto Save
 
+# ────────────────
+# Disparadores
+# ────────────────
 on:
   push:
     branches:
-      - main
+      - main        # se ejecuta en cada commit a main
   schedule:
-    - cron: '0 * * * *'
-  workflow_dispatch:
+    - cron: '0 * * * *'   # se ejecuta cada hora
+  workflow_dispatch:       # permite lanzarlo manualmente desde Actions
 
+# ────────────────
+# Permisos
+# ────────────────
 permissions:
-  contents: write   # 🔑 Permite hacer commits y push
+  contents: write   # 🔑 necesario para hacer commits y push
 
+# ────────────────
+# Jobs
+# ────────────────
 jobs:
   auto-commit:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
 
+    steps:
+      # 1. Checkout del repositorio
+      - name: Checkout repo
+        uses: actions/checkout@v4   # ✅ actualizado
+
+      # 2. Configuración de Git
       - name: Set up Git
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
 
+      # 3. Commit y push automático
       - name: Commit changes
         run: |
           git add .
           git commit -m "Auto-save changes [skip ci]" || echo "No changes to commit"
           git push
+
+      # 4. Subida de artefactos (logs, etc.)
+      - name: Upload logs
+        uses: actions/upload-artifact@v4   # ✅ versión actualizada
+        with:
+          name: auto-save-logs
+          path: .
