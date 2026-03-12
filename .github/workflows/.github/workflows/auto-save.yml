@@ -1,0 +1,25 @@
+name: Auto Save
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '*/30 * * * *'
+
+jobs:
+  auto-save:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Auto commit changes
+        run: |
+          git config --global user.name 'AutoSaveBot'
+          git config --global user.email 'bot@github.com'
+          
+          if [[ `git status --porcelain` ]]; then
+            git add .
+            git commit -m "Auto-save: $(date)"
+            git push
+          fi
