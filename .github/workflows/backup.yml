@@ -1,0 +1,26 @@
+name: Backup Automático
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Create backup
+        run: |
+          git clone --mirror https://github.com/elparivera/DisenosRhensambles.git backup.git
+          tar -czf backup-$(date +%Y%m%d).tar.gz backup.git
+      
+      - name: Upload backup
+        uses: actions/upload-artifact@v3
+        with:
+          name: backup
+          path: '*.tar.gz'
+          retention-days: 30
