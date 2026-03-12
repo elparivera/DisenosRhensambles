@@ -5,21 +5,19 @@ on:
     branches:
       - main
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '0 * * * *'  # cada hora
 
 jobs:
-  auto-save:
+  save:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Auto commit changes
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Commit changes
         run: |
-          git config --global user.name 'AutoSaveBot'
-          git config --global user.email 'bot@github.com'
-          
-          if [[ `git status --porcelain` ]]; then
-            git add .
-            git commit -m "Auto-save: $(date)"
-            git push
-          fi
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Auto-save changes" || echo "No changes"
+          git push
