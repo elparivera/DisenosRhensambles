@@ -1,26 +1,50 @@
-name: Backup Automático
+name: Auto Save
 
+# ────────────────
+# Disparadores
+# ────────────────
 on:
+  push:
+    branches:
+      - main        # se ejecuta en cada commit a main
   schedule:
-    - cron: '0 2 * * *'
-  workflow_dispatch:
+    - cron: '0 * * * *'   # se ejecuta cada hora
+  workflow_dispatch:       # permite lanzarlo manualmente desde Actions
 
+# ────────────────
+# Permisos
+# ────────────────
+permissions:
+  contents: write   # 🔑 necesario para hacer commits y push
+
+# ────────────────
+# Jobs
+# ────────────────
 jobs:
-  backup:
+  auto-commit:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      
-      - name: Create backup
+      # 1. Checkout del repositorio
+      - name: Checkout repo
+        uses: actions/checkout@v4   # ✅ actualizado
+
+      # 2. Configuración de Git
+      - name: Set up Git
         run: |
-          git clone --mirror https://github.com/elparivera/DisenosRhensambles.git backup.git
-          tar -czf backup-$(date +%Y%m%d).tar.gz backup.git
-      
-      - name: Upload backup
-        uses: actions/upload-artifact@v3
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+
+      # 3. Commit y push automático
+      - name: Commit changes
+        run: |
+          git add .
+          git commit -m "Auto-save changes [skip ci]" || echo "No changes to commit"
+          git push
+
+      # 4. Subida de artefactos (logs, etc.)
+      - name: Upload logs
+        uses: actions/upload-artifact@v4   # ✅ versión actualizada
         with:
-          name: backup
-          path: '*.tar.gz'
-          retention-days: 30
+          name: auto-save-logs
+          path: .
