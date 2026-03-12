@@ -23,11 +23,13 @@ permissions:
 jobs:
   auto-commit:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # ✅ fuerza Node.js 24 desde ya
 
     steps:
       # 1. Checkout del repositorio
       - name: Checkout repo
-        uses: actions/checkout@v4   # ✅ actualizado
+        uses: actions/checkout@v4   # versión actualizada
 
       # 2. Configuración de Git
       - name: Set up Git
@@ -44,7 +46,7 @@ jobs:
 
       # 4. Subida de artefactos (logs, etc.)
       - name: Upload logs
-        uses: actions/upload-artifact@v4   # ✅ versión actualizada
+        uses: actions/upload-artifact@v4   # versión actualizada
         with:
           name: auto-save-logs
           path: .
